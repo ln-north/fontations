@@ -90,3 +90,30 @@ record FdSelectRange4 {
     /// FD index for all glyphs in range.
     fd: u16,
 }
+
+/// Charsets format 0.
+#[read_args(num_glyphs: u16)]
+table CharsetsFormat0 {
+  /// Format = 0.
+  #[format = 0]
+  format: u8,
+  /// SID array (one entry for each glyph except for the notdef glyph).
+  #[count($num_glyphs)]
+  glyph: [u16],
+}
+
+/// Range struct for Charsets format 1.
+record CharsetsRange1 {
+  /// First SID in range.
+  first: u16,
+  /// Number of glyphs in range.
+  n_left: u8,
+}
+
+/// Range struct for Charsets format 2.
+record CharsetsRange2 {
+  /// First SID in range.
+  first: u16,
+  /// Number of glyphs in range.
+  n_left: u16,
+}

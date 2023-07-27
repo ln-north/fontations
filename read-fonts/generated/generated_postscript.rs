@@ -613,3 +613,187 @@ impl<'a> SomeRecord<'a> for FdSelectRange4 {
         }
     }
 }
+
+impl Format<u8> for CharsetsFormat0Marker {
+    const FORMAT: u8 = 0;
+}
+
+/// Charsets format 0.
+#[derive(Debug, Clone, Copy)]
+#[doc(hidden)]
+pub struct CharsetsFormat0Marker {
+    glyph_byte_len: usize,
+}
+
+impl CharsetsFormat0Marker {
+    fn format_byte_range(&self) -> Range<usize> {
+        let start = 0;
+        start..start + u8::RAW_BYTE_LEN
+    }
+    fn glyph_byte_range(&self) -> Range<usize> {
+        let start = self.format_byte_range().end;
+        start..start + self.glyph_byte_len
+    }
+}
+
+impl ReadArgs for CharsetsFormat0<'_> {
+    type Args = u16;
+}
+
+impl<'a> FontReadWithArgs<'a> for CharsetsFormat0<'a> {
+    fn read_with_args(data: FontData<'a>, args: &u16) -> Result<Self, ReadError> {
+        let num_glyphs = *args;
+        let mut cursor = data.cursor();
+        cursor.advance::<u8>();
+        let glyph_byte_len = num_glyphs as usize * u16::RAW_BYTE_LEN;
+        cursor.advance_by(glyph_byte_len);
+        cursor.finish(CharsetsFormat0Marker { glyph_byte_len })
+    }
+}
+
+impl<'a> CharsetsFormat0<'a> {
+    /// A constructor that requires additional arguments.
+    ///
+    /// This type requires some external state in order to be
+    /// parsed.
+    pub fn read(data: FontData<'a>, num_glyphs: u16) -> Result<Self, ReadError> {
+        let args = num_glyphs;
+        Self::read_with_args(data, &args)
+    }
+}
+
+/// Charsets format 0.
+pub type CharsetsFormat0<'a> = TableRef<'a, CharsetsFormat0Marker>;
+
+impl<'a> CharsetsFormat0<'a> {
+    /// Format = 0.
+    pub fn format(&self) -> u8 {
+        let range = self.shape.format_byte_range();
+        self.data.read_at(range.start).unwrap()
+    }
+
+    /// SID array (one entry for each glyph except for the notdef glyph).
+    pub fn glyph(&self) -> &'a [BigEndian<u16>] {
+        let range = self.shape.glyph_byte_range();
+        self.data.read_array(range).unwrap()
+    }
+}
+
+#[cfg(feature = "traversal")]
+impl<'a> SomeTable<'a> for CharsetsFormat0<'a> {
+    fn type_name(&self) -> &str {
+        "CharsetsFormat0"
+    }
+    fn get_field(&self, idx: usize) -> Option<Field<'a>> {
+        match idx {
+            0usize => Some(Field::new("format", self.format())),
+            1usize => Some(Field::new("glyph", self.glyph())),
+            _ => None,
+        }
+    }
+}
+
+#[cfg(feature = "traversal")]
+impl<'a> std::fmt::Debug for CharsetsFormat0<'a> {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        (self as &dyn SomeTable<'a>).fmt(f)
+    }
+}
+
+/// Range struct for Charsets format 1.
+#[derive(Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[repr(C)]
+#[repr(packed)]
+pub struct CharsetsRange1 {
+    /// First SID in range.
+    pub first: BigEndian<u16>,
+    /// Number of glyphs in range.
+    pub n_left: u8,
+}
+
+impl CharsetsRange1 {
+    /// First SID in range.
+    pub fn first(&self) -> u16 {
+        self.first.get()
+    }
+
+    /// Number of glyphs in range.
+    pub fn n_left(&self) -> u8 {
+        self.n_left
+    }
+}
+
+impl FixedSize for CharsetsRange1 {
+    const RAW_BYTE_LEN: usize = u16::RAW_BYTE_LEN + u8::RAW_BYTE_LEN;
+}
+
+impl sealed::Sealed for CharsetsRange1 {}
+
+/// SAFETY: see the [`FromBytes`] trait documentation.
+unsafe impl FromBytes for CharsetsRange1 {
+    fn this_trait_should_only_be_implemented_in_generated_code() {}
+}
+
+#[cfg(feature = "traversal")]
+impl<'a> SomeRecord<'a> for CharsetsRange1 {
+    fn traverse(self, data: FontData<'a>) -> RecordResolver<'a> {
+        RecordResolver {
+            name: "CharsetsRange1",
+            get_field: Box::new(move |idx, _data| match idx {
+                0usize => Some(Field::new("first", self.first())),
+                1usize => Some(Field::new("n_left", self.n_left())),
+                _ => None,
+            }),
+            data,
+        }
+    }
+}
+
+/// Range struct for Charsets format 2.
+#[derive(Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[repr(C)]
+#[repr(packed)]
+pub struct CharsetsRange2 {
+    /// First SID in range.
+    pub first: BigEndian<u16>,
+    /// Number of glyphs in range.
+    pub n_left: BigEndian<u16>,
+}
+
+impl CharsetsRange2 {
+    /// First SID in range.
+    pub fn first(&self) -> u16 {
+        self.first.get()
+    }
+
+    /// Number of glyphs in range.
+    pub fn n_left(&self) -> u16 {
+        self.n_left.get()
+    }
+}
+
+impl FixedSize for CharsetsRange2 {
+    const RAW_BYTE_LEN: usize = u16::RAW_BYTE_LEN + u16::RAW_BYTE_LEN;
+}
+
+impl sealed::Sealed for CharsetsRange2 {}
+
+/// SAFETY: see the [`FromBytes`] trait documentation.
+unsafe impl FromBytes for CharsetsRange2 {
+    fn this_trait_should_only_be_implemented_in_generated_code() {}
+}
+
+#[cfg(feature = "traversal")]
+impl<'a> SomeRecord<'a> for CharsetsRange2 {
+    fn traverse(self, data: FontData<'a>) -> RecordResolver<'a> {
+        RecordResolver {
+            name: "CharsetsRange2",
+            get_field: Box::new(move |idx, _data| match idx {
+                0usize => Some(Field::new("first", self.first())),
+                1usize => Some(Field::new("n_left", self.n_left())),
+                _ => None,
+            }),
+            data,
+        }
+    }
+}

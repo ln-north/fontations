@@ -7,6 +7,7 @@ mod fd_select;
 mod index;
 mod stack;
 mod string;
+mod charsets;
 
 pub mod charstring;
 pub mod dict;
@@ -17,6 +18,7 @@ pub use blend::BlendState;
 pub use index::Index;
 pub use stack::{Number, Stack};
 pub use string::{Latin1String, StringId, STANDARD_STRINGS};
+pub use charsets::{Charsets, CharsetsFormat2};
 
 /// Errors that are specific to PostScript processing.
 #[derive(Clone, Debug)]
