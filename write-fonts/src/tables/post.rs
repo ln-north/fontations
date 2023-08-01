@@ -13,7 +13,7 @@ pub struct PString(String);
 impl Post {
     /// Construct a new version 2.0 table from a glyph order.
     pub fn new_v2<'a>(order: impl IntoIterator<Item = &'a str>) -> Self {
-        let knownum_glyphs = crate::read::tables::post::DEFAULT_GLYPH_NAMES
+        let known_glyphs = crate::read::tables::post::DEFAULT_GLYPH_NAMES
             .iter()
             .enumerate()
             .map(|(i, name)| (*name, i as u16))
@@ -22,10 +22,10 @@ impl Post {
         let mut storage = Vec::new();
 
         for name in order {
-            match knownum_glyphs.get(name) {
+            match known_glyphs.get(name) {
                 Some(i) => name_index.push(*i),
                 None => {
-                    let idx = (knownum_glyphs.len() + storage.len()).try_into().unwrap();
+                    let idx = (known_glyphs.len() + storage.len()).try_into().unwrap();
                     name_index.push(idx);
                     storage.push(PString(name.into()));
                 }
