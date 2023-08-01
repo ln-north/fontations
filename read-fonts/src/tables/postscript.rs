@@ -8,6 +8,7 @@ mod index;
 mod stack;
 mod string;
 mod charsets;
+mod top_dict;
 
 pub mod charstring;
 pub mod dict;
@@ -19,6 +20,7 @@ pub use index::Index;
 pub use stack::{Number, Stack};
 pub use string::{Latin1String, StringId, STANDARD_STRINGS};
 pub use charsets::{Charsets, CharsetsFormat2};
+pub use top_dict::TopDict;
 
 /// Errors that are specific to PostScript processing.
 #[derive(Clone, Debug)]
