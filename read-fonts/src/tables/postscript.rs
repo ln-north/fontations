@@ -5,6 +5,7 @@ use std::fmt;
 mod blend;
 mod fd_select;
 mod index;
+mod scale;
 mod stack;
 mod string;
 mod charsets;
@@ -17,6 +18,7 @@ include!("../../generated/generated_postscript.rs");
 
 pub use blend::BlendState;
 pub use index::Index;
+pub use scale::{Scaler, ScalerSubfont};
 pub use stack::{Number, Stack};
 pub use string::{Latin1String, StringId, STANDARD_STRINGS};
 pub use charsets::{Charsets, CharsetsFormat2};
@@ -38,6 +40,8 @@ pub enum Error {
     CharstringNestingDepthLimitExceeded,
     MissingSubroutines,
     MissingBlendState,
+    MissingPrivateDict,
+    MissingCharstrings,
     Read(ReadError),
 }
 
@@ -102,7 +106,12 @@ impl fmt::Display for Error {
                     "encountered a blend operator but no blend state was provided"
                 )
             }
-
+            Self::MissingPrivateDict => {
+                write!(f, "CFF table does not contain a private dictionary")
+            }
+            Self::MissingCharstrings => {
+                write!(f, "CFF table does not contain a charstrings index")
+            }
             Self::Read(err) => write!(f, "{err}"),
         }
     }
